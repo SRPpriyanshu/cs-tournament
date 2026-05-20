@@ -34,11 +34,24 @@ h2 {
     margin-bottom:20px;
 }
 
+/* INPUT ROW */
+.input-row {
+    display:flex;
+    align-items:center;
+    margin:10px 0;
+}
+
+/* LABEL */
+.label {
+    width:50px;
+    font-weight:bold;
+    color:#94a3b8;
+}
+
 /* INPUT */
 input {
-    width:100%;
+    flex:1;
     padding:14px;
-    margin:10px 0;
     border-radius:12px;
     border:none;
     background:#020617;
@@ -66,7 +79,6 @@ button {
     font-size:16px;
     color:white;
     cursor:pointer;
-
     background: linear-gradient(120deg, #3b82f6, #2563eb);
     transition:0.3s;
 }
@@ -95,13 +107,30 @@ button:hover {
 
 <form method="POST">
 
-<input name="M" type="number" value="{{ data.M or 0 }}" placeholder="Matches">
-<input name="W" type="number" value="{{ data.W or 0 }}" placeholder="Wins">
-<input name="L" type="number" value="{{ data.L or 0 }}" placeholder="Losses">
-<input name="D" type="number" value="{{ data.D or 0 }}" placeholder="Draws">
+<div class="input-row">
+<span class="label">M</span>
+<input name="M" type="number" value="{{ data.M or 0 }}">
+</div>
 
-<!-- ✅ NEW FIELD -->
-<input name="RD" type="number" value="{{ data.RD or 0 }}" placeholder="Round Diff (can be negative)">
+<div class="input-row">
+<span class="label">W</span>
+<input name="W" type="number" value="{{ data.W or 0 }}">
+</div>
+
+<div class="input-row">
+<span class="label">L</span>
+<input name="L" type="number" value="{{ data.L or 0 }}">
+</div>
+
+<div class="input-row">
+<span class="label">D</span>
+<input name="D" type="number" value="{{ data.D or 0 }}">
+</div>
+
+<div class="input-row">
+<span class="label">RD</span>
+<input name="RD" type="number" value="{{ data.RD or 0 }}">
+</div>
 
 <button>Save Changes</button>
 
