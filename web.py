@@ -1,10 +1,15 @@
-from flask import Flask, render_template, request, redirect
+from flask import Flask, render_template, request, redirect, session, url_for
 import json
 import os
 
 app = Flask(__name__)
+app.secret_key = "secret123"  # change later
 
 DATA_FILE = "data.json"
+
+# 🔐 LOGIN DETAILS
+USERNAME = "admin"
+PASSWORD = "1234"
 
 
 def load():
@@ -34,8 +39,35 @@ def home():
     return render_template("index.html", teams=sorted_teams)
 
 
+# 🔐 LOGIN ROUTE
+@app.route("/login", methods=["GET", "POST"])
+def login():
+    if request.method == "POST":
+        user = request.form.get("username")
+        pwd = request.form.get("password")
+
+        if user == USERNAME and pwd == PASSWORD:
+            session["user"] = user
+            return redirect("/admin")
+
+        return "Invalid credentials ❌"
+
+    return render_template("login.html")
+
+
+# 🔐 LOGOUT
+@app.route("/logout")
+def logout():
+    session.pop("user", None)
+    return redirect("/login")
+
+
+# 🔐 PROTECTED ADMIN
 @app.route("/admin", methods=["GET", "POST"])
 def admin():
+    if "user" not in session:
+        return redirect("/login")
+
     data = load()
 
     if request.method == "POST":
@@ -50,37 +82,11 @@ def admin():
     return render_template("admin.html", teams=data["teams"])
 
 
-@app.route("/edit/<team>", methods=["GET", "POST"])
-def edit(team):
-    data = load()
-
-    if team not in data["teams"]:
-        return "Team not found"
-
-    if request.method == "POST":
-        M = int(request.form.get("M") or 0)
-        W = int(request.form.get("W") or 0)
-        D = int(request.form.get("D") or 0)
-        L = int(request.form.get("L") or 0)
-
-        P = W * 3 + D
-
-        data["teams"][team] = {
-            "M": M,
-            "W": W,
-            "L": L,
-            "D": D,
-            "P": P
-        }
-
-        save(data)
-        return redirect(f"/admin?updated={team}")
-
-    return render_template("edit.html", team=team, data=data["teams"][team])
-
-
 @app.route("/delete/<team>")
 def delete(team):
+    if "user" not in session:
+        return redirect("/login")
+
     data = load()
     data["teams"].pop(team, None)
     save(data)
